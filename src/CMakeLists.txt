@@ -17,7 +17,6 @@ SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
 # Files to add to compilation
 FILE(GLOB_RECURSE KHIVALIB_CODE 
     "${KHIVALIB_SRC}/*.cpp"
@@ -32,12 +31,22 @@ TARGET_INCLUDE_DIRECTORIES(${KHIVALIB} PUBLIC
                            $<INSTALL_INTERFACE:${KHIVA_INSTALL_INC_DIR}>
                            ${ArrayFire_INCLUDE_DIRS}
                            ${Boost_INCLUDE_DIRS})
-
-# Declare compilation libraries
-TARGET_LINK_LIBRARIES(${KHIVALIB}
-                      ${ArrayFire_Unified_LIBRARIES}
+                           
+IF(KHIVA_ONLY_CPU_BACKEND)
+    # Declare compilation libraries
+    TARGET_LINK_LIBRARIES(${KHIVALIB}
+                      ${ArrayFire_CPU_LIBRARIES}
                       Eigen3::Eigen
+                      ${Boost_LIBRARIES}
                       ${CMAKE_DL_LIBS})
+ELSE()
+    # Declare compilation libraries
+    TARGET_LINK_LIBRARIES(${KHIVALIB}
+            ${ArrayFire_Unified_LIBRARIES}
+            Eigen3::Eigen
+            ${Boost_LIBRARIES}
+            ${CMAKE_DL_LIBS})
+ENDIF()
 
 # Add compile definitions
 TARGET_COMPILE_DEFINITIONS(${KHIVALIB} PRIVATE KHIVA_STATICLIB PUBLIC AF_UNIFIED)
